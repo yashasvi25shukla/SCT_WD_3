@@ -59,6 +59,6 @@ A simple and visually appealing **Tic Tac Toe** game built with **HTML, CSS, and
 1. **Clone the repository**:
    ```bash
 ## Author 
-** Yashasvi Shukla
-   git clone <repository-url>
+Yashasvi Shukla
+   
 
