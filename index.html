@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tic Tac Toe Game</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Poppins",sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#fdfbfb,#ebedee);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  color:#444;
+}
+
+/* Brand name */
+.brand{
+  align-self:flex-start;
+  padding:20px 30px;
+  font-size:18px;
+  font-weight:600;
+  color:#8b5cf6;
+}
+
+/* Game box */
+.container{
+  width:380px;
+  background:#ffffff;
+  border-radius:28px;
+  padding:25px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.12);
+  text-align:center;
+}
+
+h1{
+  font-size:30px;
+  margin-bottom:15px;
+  color:#6d28d9;
+}
+
+/* Mode buttons */
+.mode{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:15px;
+}
+
+.mode button{
+  padding:8px 16px;
+  border:none;
+  border-radius:25px;
+  background:#fde2e4;
+  color:#7c2d12;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.mode button:hover{
+  background:#fbcfe8;
+  transform:scale(1.05);
+}
+
+/* Status text */
+.status{
+  min-height:28px;
+  margin-bottom:15px;
+  font-size:16px;
+  color:#0f766e;
+}
+
+/* Board */
+.board{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.cell{
+  height:100px;
+  border-radius:20px;
+  background:#ecfeff;
+  font-size:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.cell:hover{
+  background:#cffafe;
+  transform:scale(1.05);
+}
+
+.cell.X{
+  color:#7c3aed;
+}
+
+.cell.O{
+  color:#f97316;
+}
+
+/* Restart */
+.restart{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:30px;
+  background:#bbf7d0;
+  color:#065f46;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.restart:hover{
+  background:#86efac;
+  transform:scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="brand">🌸 SkillCraft Technologies</div>
+
+<div class="container">
+  <h1>🎮 Tic Tac Toe Game</h1>
+
+  <div class="mode">
+    <button onclick="setMode('pvp')">👥 Player vs Player</button>
+    <button onclick="setMode('cpu')">🤖 Player vs Computer</button>
+  </div>
+
+  <div class="status" id="statusText">✨ Pick a mode & enjoy the pastel fun!</div>
+
+  <div class="board">
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  </div>
+
+  <button class="restart" onclick="restartGame()">🔄 Restart Game</button>
+</div>
+
+<script>
+const cells=document.querySelectorAll(".cell");
+const statusText=document.getElementById("statusText");
+
+let board=Array(9).fill("");
+let currentPlayer="X";
+let gameActive=false;
+let mode="pvp";
+
+const wins=[
+ [0,1,2],[3,4,5],[6,7,8],
+ [0,3,6],[1,4,7],[2,5,8],
+ [0,4,8],[2,4,6]
+];
+
+function setMode(m){
+ mode=m;
+ restartGame();
+ statusText.innerHTML = m==="cpu"
+  ? "🤖 Pastel AI is ready to play!"
+  : "🎯 Two players, double the fun!";
+}
+
+cells.forEach((cell,i)=>{
+ cell.addEventListener("click",()=>handleClick(i));
+});
+
+function handleClick(i){
+ if(!gameActive || board[i]!="") return;
+
+ makeMove(i,currentPlayer);
+
+ if(checkWin()){
+  statusText.innerHTML=`🏆 <b>${currentPlayer}</b> wins! Calm & clever! 🌈`;
+  gameActive=false;
+  return;
+ }
+
+ if(board.every(c=>c!="")){
+  statusText.innerHTML="🤝 Draw! Balanced minds ✨";
+  gameActive=false;
+  return;
+ }
+
+ currentPlayer=currentPlayer==="X"?"O":"X";
+
+ if(mode==="cpu" && currentPlayer==="O"){
+  statusText.innerHTML="🤖 AI is thinking softly...";
+  setTimeout(computerMove,600);
+ }else{
+  statusText.innerHTML=`👉 Player <b>${currentPlayer}</b>'s turn`;
+ }
+}
+
+function makeMove(i,p){
+ board[i]=p;
+ cells[i].textContent=p;
+ cells[i].classList.add(p);
+}
+
+function computerMove(){
+ let empty=board.map((v,i)=>v==""?i:null).filter(v=>v!=null);
+ let pick=empty[Math.floor(Math.random()*empty.length)];
+ makeMove(pick,"O");
+
+ if(checkWin()){
+  statusText.innerHTML="🤖 AI wins! Gentle but smart 💫";
+  gameActive=false;
+  return;
+ }
+
+ if(board.every(c=>c!="")){
+  statusText.innerHTML="😌 Draw! Peaceful match!";
+  gameActive=false;
+  return;
+ }
+
+ currentPlayer="X";
+ statusText.innerHTML="💪 Your turn, pastel champion!";
+}
+
+function checkWin(){
+ return wins.some(w=>{
+  const[a,b,c]=w;
+  return board[a] && board[a]===board[b] && board[a]===board[c];
+ });
+}
+
+function restartGame(){
+ board.fill("");
+ cells.forEach(c=>{
+  c.textContent="";
+  c.classList.remove("X","O");
+ });
+ currentPlayer="X";
+ gameActive=true;
+ statusText.innerHTML="🌸 Player X starts calmly!";
+}
+</script>
+
+</body>
+</html>
